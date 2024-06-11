@@ -1,4 +1,4 @@
-import { CellData } from "../components/Grid";
+import { CellData } from "../contexts/GameContext";
 
 const winConditions = [
   [0, 1, 2],
