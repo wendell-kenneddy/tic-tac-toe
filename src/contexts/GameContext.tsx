@@ -26,10 +26,13 @@ export const GameContext = createContext<GameContextData | null>(null);
 
 export function GameContextProvider({ children }: GameContextProviderProps) {
   const [cells, setCells] = useState<CellData[]>(createCellArray());
+  const [markedCellsCount, setMarkedCellsCount] = useState<number>(0);
   const [currentPlayer, setCurrentPlayer] = useState<Player>("X");
-  const [winner, setWinner] = useState<Player | null>(null);
+  const [winner, setWinner] = useState<Player | "draw" | null>(null);
 
   function handleCellClick(id: string) {
+    if (winner) return;
+
     const newCells: CellData[] = cells.map((cell) => {
       if (id != cell.id) return cell;
       return {
@@ -37,16 +40,20 @@ export function GameContextProvider({ children }: GameContextProviderProps) {
         content: currentPlayer,
       };
     });
+    const haveAnyoneWon = checkForWinConditions(newCells);
+    const nextPlayer = currentPlayer == "X" ? "O" : "X";
+
     setCells(newCells);
-    const isGameOver = checkForWinConditions(newCells);
-    if (isGameOver) return setWinner(currentPlayer);
-    setCurrentPlayer(currentPlayer == "X" ? "O" : "X");
+    setMarkedCellsCount(markedCellsCount + 1);
+    if (haveAnyoneWon) return setWinner(currentPlayer);
+    setCurrentPlayer(nextPlayer);
   }
 
   function handleResetGame() {
     setCells(createCellArray());
     setCurrentPlayer("X");
     setWinner(null);
+    setMarkedCellsCount(0);
   }
 
   return (
@@ -55,6 +62,7 @@ export function GameContextProvider({ children }: GameContextProviderProps) {
         cells,
         currentPlayer,
         winner,
+        markedCellsCount,
         onCellClick: (id) => handleCellClick(id),
         resetGame: () => handleResetGame(),
       }}
