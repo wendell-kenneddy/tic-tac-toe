@@ -11,8 +11,9 @@ export interface CellData {
 
 export interface GameContextData {
   currentPlayer: Player;
-  winner: Player | null;
+  winner: Player | "draw" | null;
   cells: CellData[];
+  markedCellsCount: number;
   onCellClick: (id: string) => void;
   resetGame: () => void;
 }
